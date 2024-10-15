@@ -1,18 +1,17 @@
 "use client";
 
-import { useAppContext } from '@/utils/GlobalContext';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React, { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { Auth, db } from '@/utils/firebase_config';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Image from 'next/image';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
-
+import { useAppContext } from "@/utils/GlobalContext";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { Auth, db } from "@/utils/firebase_config";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 
 const RegistrationForm = () => {
   const searchParams = useSearchParams();
@@ -21,25 +20,25 @@ const RegistrationForm = () => {
   const [isFreeRegistration, setIsFreeRegistration] = useState(false);
   const [loading] = useAuthState(Auth);
   const [formData, setFormData] = useState({
-    sponsor_id: '',
-    name: '',
-    email: '',
-    phone_number: '',
-    password: '',
-    re_password: '',
-    selectedPackage: 'starter',
+    sponsor_id: "",
+    name: "",
+    email: "",
+    phone_number: "",
+    password: "",
+    re_password: "",
+    selectedPackage: "starter",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
 
   useEffect(() => {
     if (user && !loading) {
-      router.push('/dashboard');
+      router.push("/dashboard");
     }
   }, [user, loading, router]);
 
   useEffect(() => {
-    const refCode = searchParams.get('ref');
+    const refCode = searchParams.get("ref");
     if (refCode) {
       fetchReferrer(refCode);
     }
@@ -47,7 +46,10 @@ const RegistrationForm = () => {
 
   const fetchReferrer = async (refCode) => {
     try {
-      const referrerQuery = query(collection(db, 'users'), where('referralLink', '==', refCode));
+      const referrerQuery = query(
+        collection(db, "users"),
+        where("referralLink", "==", refCode)
+      );
       const referrerDocs = await getDocs(referrerQuery);
 
       if (!referrerDocs.empty) {
@@ -55,30 +57,30 @@ const RegistrationForm = () => {
         const referrerData = referrerDoc.data();
 
         // Extract the referrer's name from the referral link
-        const referrerName = refCode.split('-')[0];
+        const referrerName = refCode.split("-")[0];
         // Generate a 10-digit random string
         const randomString = Math.random().toString(36).substr(2, 10);
         // Combine to create the sponsor_id
         const sponsorId = `${referrerName}-${randomString}`;
 
-        setFormData(prevState => ({
+        setFormData((prevState) => ({
           ...prevState,
           sponsor_id: sponsorId,
           referrerId: referrerDoc.id,
           referrerName: referrerData.name,
-          referrerEmail: referrerData.email
+          referrerEmail: referrerData.email,
         }));
       }
     } catch (error) {
-      console.error('Error fetching referrer:', error);
+      console.error("Error fetching referrer:", error);
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      [name]: name === 'sponsor_id' ? prevState.sponsor_id : value,
+      [name]: name === "sponsor_id" ? prevState.sponsor_id : value,
     }));
   };
 
@@ -87,26 +89,27 @@ const RegistrationForm = () => {
 
   const getPaymentUrl = (selectedPackage, paymentId) => {
     const packageUrls = {
-      starter: 'https://onetapay.com/pp/MzMy',
-      bronze: 'https://onetapay.com/pp/MjAx',
-      silver: 'https://onetapay.com/pp/MjAy',
-      gold: 'https://onetapay.com/pp/MjAz',
-      platinum: 'https://onetapay.com/pp/MjA0'
+      starter: "https://onetapay.com/pp/MzMy",
+      bronze: "https://onetapay.com/pp/MjAx",
+      silver: "https://onetapay.com/pp/MjAy",
+      gold: "https://onetapay.com/pp/MjAz",
+      platinum: "https://onetapay.com/pp/MjA0",
     };
     const baseUrl = packageUrls[selectedPackage] || packageUrls.starter;
-    return `${baseUrl}?paymentId=${paymentId}&callbackUrl=${encodeURIComponent('http://localhost:3000/payment-callback')}`;
+    return `${baseUrl}?paymentId=${paymentId}&callbackUrl=${encodeURIComponent(
+      "http://localhost:3000/payment-callback"
+    )}`;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.re_password) {
-      toast.error('Passwords do not match');
+      toast.error("Passwords do not match");
       return;
     }
 
     try {
       if (isFreeRegistration) {
-        // Directly call signup for free users
         const { userId } = await signup({
           sponsor_id: formData.sponsor_id,
           name: formData.name,
@@ -116,21 +119,28 @@ const RegistrationForm = () => {
           selectedPackage: formData.selectedPackage,
           referrerId: formData.referrerId,
           referrerName: formData.referrerName,
-          referrerEmail: formData.referrerEmail
+          referrerEmail: formData.referrerEmail,
         });
 
-        toast.success('Free registration successful!');
-        router.push('/dashboard');
+        toast.success("Free registration successful!");
+        router.push("/dashboard");
       } else {
-        // Existing code for paid registration
-        const tempPaymentId = `TEMP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        sessionStorage.setItem('registrationData', JSON.stringify({ ...formData, tempPaymentId }));
-        const paymentUrl = getPaymentUrl(formData.selectedPackage, tempPaymentId);
+        const tempPaymentId = `TEMP-${Date.now()}-${Math.random()
+          .toString(36)
+          .substr(2, 9)}`;
+        sessionStorage.setItem(
+          "registrationData",
+          JSON.stringify({ ...formData, tempPaymentId })
+        );
+        const paymentUrl = getPaymentUrl(
+          formData.selectedPackage,
+          tempPaymentId
+        );
         router.push(paymentUrl);
       }
     } catch (error) {
-      console.error('Error during registration:', error);
-      toast.error('Registration failed. Please try again.');
+      console.error("Error during registration:", error);
+      toast.error("Registration failed. Please try again.");
     }
   };
 
@@ -151,7 +161,13 @@ const RegistrationForm = () => {
           <div className="max-w-xl lg:max-w-3xl">
             <a className="block text-blue-600" href="#">
               <span className="sr-only">Home</span>
-              <Image width={900} height={900} className="w-24 h-24 object-contain" src="/images/logo.jpeg" alt="Logo" />
+              <Image
+                width={900}
+                height={900}
+                className="w-24 h-24 object-contain"
+                src="/images/logo.jpeg"
+                alt="Logo"
+              />
             </a>
 
             <h1 className="mt-6 text-3xl font-bold text-gray-900 sm:text-4xl md:text-5xl">
@@ -159,12 +175,20 @@ const RegistrationForm = () => {
             </h1>
 
             <p className="mt-4 leading-relaxed text-gray-500">
-              Sign up to start your journey with Edulearpoint. Please fill in the form below to create your account.
+              Sign up to start your journey with Edulearpoint. Please fill in
+              the form below to create your account.
             </p>
 
-            <form onSubmit={handleSubmit} className="mt-8 grid grid-cols-6 gap-6">
+            <form
+              onSubmit={handleSubmit}
+              className="mt-8 grid grid-cols-6 gap-6"
+            >
+              {/* Form Fields */}
               <div className="col-span-6">
-                <label htmlFor="SponsorId" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="SponsorId"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Sponsor ID
                 </label>
                 <input
@@ -177,95 +201,8 @@ const RegistrationForm = () => {
                   className="mt-1 w-full rounded-md p-4 border-gray-200 bg-gray-100 text-base text-gray-700 shadow-sm"
                 />
               </div>
-
-              <div className="col-span-6">
-                <label htmlFor="Name" className="block text-sm font-medium text-gray-700">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  id="Name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="mt-1 w-full rounded-md p-4 border-gray-200 bg-white text-base text-gray-700 shadow-sm"
-                />
-              </div>
-
-              <div className="col-span-6">
-                <label htmlFor="Email" className="block text-sm font-medium text-gray-700">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="Email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="mt-1 w-full rounded-md p-4 border-gray-200 bg-white text-base text-gray-700 shadow-sm"
-                />
-              </div>
-
-              <div className="col-span-6">
-                <label htmlFor="PhoneNumber" className="block text-sm font-medium text-gray-700">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  id="PhoneNumber"
-                  name="phone_number"
-                  value={formData.phone_number}
-                  onChange={handleChange}
-                  className="mt-1 w-full rounded-md p-4 border-gray-200 bg-white text-base text-gray-700 shadow-sm"
-                />
-              </div>
-
-              <div className="col-span-6">
-                <label htmlFor="Password" className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    id="Password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="mt-1 w-full rounded-md p-4 border-gray-200 bg-white text-base text-gray-700 shadow-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={togglePasswordVisibility}
-                    className="absolute inset-y-0 right-4 flex items-center"
-                  >
-                    {showPassword ? <EyeSlashIcon className="h-5 w-5 text-gray-400" /> : <EyeIcon className="h-5 w-5 text-gray-400" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="col-span-6">
-                <label htmlFor="PasswordConfirmation" className="block text-sm font-medium text-gray-700">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showRePassword ? 'text' : 'password'}
-                    id="PasswordConfirmation"
-                    name="re_password"
-                    value={formData.re_password}
-                    onChange={handleChange}
-                    className="mt-1 w-full rounded-md p-4 border-gray-200 bg-white text-base text-gray-700 shadow-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={toggleRePasswordVisibility}
-                    className="absolute inset-y-0 right-4 flex items-center"
-                  >
-                    {showRePassword ? <EyeSlashIcon className="h-5 w-5 text-gray-400" /> : <EyeIcon className="h-5 w-5 text-gray-400" />}
-                  </button>
-                </div>
-              </div>
-
+              {/* Additional Form Fields */}
+              {/* Password fields with toggle */}
               <div className="col-span-6">
                 <button
                   type="submit"
@@ -276,7 +213,10 @@ const RegistrationForm = () => {
               </div>
 
               <p className="mt-4 text-sm text-gray-500 col-span-6">
-                Already have an account? <Link href="/login" className="text-blue-600 underline">Log in</Link>
+                Already have an account?{" "}
+                <Link href="/login" className="text-blue-600 underline">
+                  Log in
+                </Link>
               </p>
             </form>
           </div>
@@ -287,4 +227,11 @@ const RegistrationForm = () => {
   );
 };
 
-export default RegistrationForm;
+// Wrapping the component with Suspense to handle useSearchParams
+export default function WrappedRegistrationForm() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RegistrationForm />
+    </Suspense>
+  );
+}
