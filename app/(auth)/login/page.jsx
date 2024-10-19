@@ -1,21 +1,20 @@
-"use client"
-import { Auth } from '@/utils/firebase_config'
-import { useAppContext } from '@/utils/GlobalContext'
-import { signInWithEmailAndPassword } from 'firebase/auth'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
-import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
-
+"use client";
+import { Auth } from "@/utils/firebase_config";
+import { useAppContext } from "@/utils/GlobalContext";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginPage = () => {
-  const { login, user } = useAppContext()
-  const router = useRouter()
+  const { login, user } = useAppContext();
+  const router = useRouter();
 
   const [userdata, setuserdata] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -25,18 +24,18 @@ const LoginPage = () => {
       // Remove this redirect as it's now handled in the login function
       // router.push('/dashboard')
     }
-  }, [user, router])
+  }, [user, router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setuserdata(prevState => ({
+    setuserdata((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const togglePasswordVisibility = () => {
-    setShowPassword(prevState => !prevState);
+    setShowPassword((prevState) => !prevState);
   };
 
   const handleSubmit = async (e) => {
@@ -46,15 +45,14 @@ const LoginPage = () => {
       // Remove the router.push here as it's now handled in the login function
       // toast.success('Login Successful')
     } catch (error) {
-        toast.error("Login failed. Please check your credentials.");
-        console.error(error.message);
+      toast.error("Login failed. Please check your credentials.");
+      console.error(error.message);
     }
-};
+  };
 
   if (user) {
     return null; // or you could render a loading spinner here
   }
-
 
   return (
     <section className="relative flex flex-wrap lg:h-screen lg:items-center bg-zinc-100">
@@ -63,19 +61,21 @@ const LoginPage = () => {
           <h1 className="text-2xl font-bold sm:text-3xl">Get started today!</h1>
 
           <p className="mt-4 text-gray-500">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Et libero nulla eaque error neque
-            ipsa culpa autem, at itaque nostrum!
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Et libero
+            nulla eaque error neque ipsa culpa autem, at itaque nostrum!
           </p>
         </div>
 
         <form action="#" className="mx-auto mb-0 mt-8 max-w-md space-y-4">
           <div>
-            <label htmlFor="email" className="sr-only">Email</label>
+            <label htmlFor="email" className="sr-only">
+              Email
+            </label>
 
             <div className="relative">
               <input
                 type="email"
-                name='email'
+                name="email"
                 value={userdata.email}
                 onChange={handleChange}
                 className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
@@ -102,11 +102,13 @@ const LoginPage = () => {
           </div>
 
           <div>
-            <label htmlFor="password" className="sr-only">Password</label>
+            <label htmlFor="password" className="sr-only">
+              Password
+            </label>
 
             <div className="relative">
               <input
-                name='password'
+                name="password"
                 value={userdata.password}
                 onChange={handleChange}
                 type={showPassword ? "text" : "password"}
@@ -114,7 +116,10 @@ const LoginPage = () => {
                 placeholder="Enter password"
               />
 
-              <span className="absolute inset-y-0 end-0 grid place-content-center px-4 cursor-pointer" onClick={togglePasswordVisibility}>
+              <span
+                className="absolute inset-y-0 end-0 grid place-content-center px-4 cursor-pointer"
+                onClick={togglePasswordVisibility}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="size-4 text-gray-400"
@@ -139,14 +144,15 @@ const LoginPage = () => {
                   )}
                 </svg>
               </span>
-              
             </div>
           </div>
 
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-500">
               No account?
-              <Link className="underline" href="/registration">Sign up</Link>
+              <Link className="underline" href="/registration">
+                Sign up
+              </Link>
             </p>
 
             <button
@@ -179,7 +185,7 @@ const LoginPage = () => {
         theme="colored"
       />
     </section>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;
