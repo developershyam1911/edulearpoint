@@ -15,9 +15,9 @@ const Founder = () => {
   const founders = [
     {
       id: 1,
-      name: "Mr. _______",
+      name: "Mr. Madhav Kumar",
       position: "Founder ",
-      role: "Meet Mr______, Meet Mr.Madhav Kumar Choudhary, the founder of an innovative education platform EDULEARPOINT dedicated to democratizing access to quality education. Having earned 25 lakh+ , He is on a mission to empower over 1lakh entrepreneurs in India. With visionary leadership, They inspire growth, learning, and entrepreneurship for a bright future",
+      role: "Meet Mr.Madhav Kumar Choudhary, the founder of an innovative education platform EDULEARPOINT dedicated to democratizing access to quality education. Having earned 25 lakh+ , He is on a mission to empower over 1lakh entrepreneurs in India. With visionary leadership, They inspire growth, learning, and entrepreneurship for a bright future",
       socialLink: "https://www.linkedin.com/in/shweta-kumari-0106901b0/",
       image: img1,
       insta:
