@@ -10,11 +10,11 @@ const teamMembers = [
     title: "Marketing Expert",
     image: mem1,
   },
-  // {
-  //   name: "Moksh Sonkar ",
-  //   title: "Business Head",
-  //   image: mem2
-  // },
+  {
+    name: "Gopal Kumar",
+    title: "Business head",
+    image: mem2,
+  },
 ];
 
 const TeamCard = ({ member }) => {
